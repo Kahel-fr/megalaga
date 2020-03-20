@@ -31,11 +31,17 @@ int main()
         VDP_setTileMapXY(PLAN_B,TILE_ATTR_FULL(PAL1,0,0,0,val), thex, they );
     }
 
-
-
-
+    //store background offset
+    int offset = 0;
+    //set scrolling for moving background
+    VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
 	while(1)
 	{
+        //scroll background
+        VDP_setVerticalScroll(PLAN_B,offset -= 2);
+        //to loop the background
+        if(offset >= 256) offset = 0;
+
 		VDP_waitVSync();
 	}
 
