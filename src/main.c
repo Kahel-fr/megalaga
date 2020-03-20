@@ -6,6 +6,10 @@
 #define LEFT_EDGE 0
 #define RIGHT_EDGE 320
 
+//indexes for ship when not moving and when moving
+#define ANIM_STRAIGHT 0
+#define ANIM_MOVE 1
+
 //number of ennemies
 #define MAX_ENEMIES 6
 
@@ -82,19 +86,36 @@ void positionEnemies(){
 //inputs handler that will be used
 void myJoyHandler( u16 joy, u16 changed, u16 state)
 {
+    //for the joystick 1
     if (joy == JOY_1)
     {
+        //if right button is pressed
         if (state & BUTTON_RIGHT)
 	    {
+            //set velocity to 2 to the right
             player.velx = 2;
+            //set sprite to moving animation
+            SPR_setAnim(player.sprite,ANIM_MOVE);
+            //"mirror" the sprite to right (flip the sprite)
+            SPR_setHFlip(player.sprite,TRUE);
         }
+         //if left button is pressed
         else if (state & BUTTON_LEFT)
         {
+            //set velocity to 2 to the left
             player.velx = -2;
+            //set sprite to moving animation
+            SPR_setAnim(player.sprite,ANIM_MOVE);
+            //"mirror" the sprite to left (unflip the sprite)
+            SPR_setHFlip(player.sprite,FALSE);
         }
+        //if no direction button is pressed
         else{
             if( (changed & BUTTON_RIGHT) | (changed & BUTTON_LEFT) ){
+                //no velocity
                 player.velx = 0;
+                //set sprite to not moving animation
+                SPR_setAnim(player.sprite,ANIM_STRAIGHT);
             }
         }
     }
