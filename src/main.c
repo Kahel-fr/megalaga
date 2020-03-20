@@ -43,6 +43,19 @@ void reviveEntity(Entity* e){
 	SPR_setVisibility(e->sprite,VISIBLE);
 }
 
+//update player position (velocity is set by inputs handler)
+void positionPlayer(){
+    //add velocity to position
+    player.x += player.velx;
+
+    //if the position exceeds screen, set position to edge position
+    if(player.x < LEFT_EDGE) player.x = LEFT_EDGE;
+    if(player.x + player.w > RIGHT_EDGE) player.x = RIGHT_EDGE - player.w;
+
+    //set sprite position
+    SPR_setPosition(player.sprite,player.x,player.y);
+}
+
 //update ennemies positions
 void positionEnemies(){
     u16 i = 0;
@@ -66,8 +79,33 @@ void positionEnemies(){
     }
 }
 
+//inputs handler that will be used
+void myJoyHandler( u16 joy, u16 changed, u16 state)
+{
+    if (joy == JOY_1)
+    {
+        if (state & BUTTON_RIGHT)
+	    {
+            player.velx = 2;
+        }
+        else if (state & BUTTON_LEFT)
+        {
+            player.velx = -2;
+        }
+        else{
+            if( (changed & BUTTON_RIGHT) | (changed & BUTTON_LEFT) ){
+                player.velx = 0;
+            }
+        }
+    }
+}
+
 int main()
 {
+    //init inputs
+    JOY_init();
+    //use the custom inputs handler
+    JOY_setEventHandler( &myJoyHandler );
     //load tile
     SYS_disableInts();
     VDP_loadTileSet(background.tileset,1,DMA);
@@ -147,6 +185,9 @@ int main()
         VDP_setVerticalScroll(PLAN_B,offset -= 2);
         //to loop the background
         if(offset >= 256) offset = 0;
+
+        //update player position
+        positionPlayer();
 
         //update enemies positions
         positionEnemies();
