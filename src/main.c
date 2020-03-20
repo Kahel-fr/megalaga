@@ -2,6 +2,9 @@
 #include <resources.h>
 #include <kdebug.h>
 
+//number of ennemies
+#define MAX_ENEMIES 6
+
 //entity structure (like player, ennemies, ect...)
 typedef struct {
 	int x;
@@ -18,6 +21,22 @@ typedef struct {
 //player entity
 Entity player = {0, 0, 16, 16, 0, 0, 0, "PLAYER"};
 
+//ennemies entities
+Entity enemies[MAX_ENEMIES];
+
+//count of ennemies still alive
+u16 enemiesLeft = 0;
+
+void killEntity(Entity* e){
+	e->health = 0;
+	SPR_setVisibility(e->sprite,HIDDEN);
+}
+
+void reviveEntity(Entity* e){
+	e->health = 1;
+	SPR_setVisibility(e->sprite,VISIBLE);
+}
+
 int main()
 {
     //load tile
@@ -28,7 +47,7 @@ int main()
     SYS_enableInts();
 
     //-random background
-    //pixel index
+    //index used for tiles and ennemies
     int i = 0;
     //tile position
     int thex = 0;
@@ -67,6 +86,30 @@ int main()
     player.health = 1;
     player.sprite = SPR_addSprite(&ship,player.x,player.y,TILE_ATTR(PAL1,0,FALSE,FALSE));
     SPR_update();
+
+    /*Create all enemy*/
+    //point to first ennemy
+    Entity* e = enemies;
+    //for each enemy
+    for(i = 0; i < MAX_ENEMIES; i++){
+        //set position, size, health
+        e->x = i*32;
+        e->y = 32;
+        e->w = 16;
+        e->h = 16;
+        e->velx = 1;
+        e->health = 1;
+        //set sprite (using ship sprite but flipped toward player and with a different color pal)
+        e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
+        //set ennemy name
+        sprintf(e->name, "En%d",i);
+        //increment ennemy count
+        enemiesLeft++;
+        //next enemy
+        e++;
+    }
+    //set color pal used for enemies
+    VDP_setPaletteColor(34,RGB24_TO_VDPCOLOR(0x0078f8));
 
 	while(1)
 	{
