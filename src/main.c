@@ -2,6 +2,19 @@
 #include <resources.h>
 #include <kdebug.h>
 
+//entity structure (like player, ennemies, ect...)
+typedef struct {
+	int x;
+	int y;
+	int w;
+	int h;
+	int velx;
+	int vely;
+	int health;
+	Sprite* sprite;
+	char name[6];
+} Entity;
+
 int main()
 {
     //disable system inputs
