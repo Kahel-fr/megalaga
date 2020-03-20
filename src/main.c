@@ -4,6 +4,9 @@
 
 int main()
 {
+    //disable system inputs
+    SYS_disableInts();
+
     //load tile
     VDP_loadTileSet(background.tileset,1,DMA);
     //set his palette
@@ -45,5 +48,7 @@ int main()
 		VDP_waitVSync();
 	}
 
+    //re-enable system inputs
+    SYS_enableInts();
 	return(0);
 }
