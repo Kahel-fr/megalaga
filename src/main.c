@@ -10,8 +10,9 @@
 #define ANIM_STRAIGHT 0
 #define ANIM_MOVE 1
 
-//number of ennemies
+//max number of ennemies and bullets on the screen
 #define MAX_ENEMIES 6
+#define MAX_BULLETS	3
 
 //entity structure (like player, ennemies, ect...)
 typedef struct {
@@ -32,8 +33,14 @@ Entity player = {0, 0, 16, 16, 0, 0, 0, "PLAYER"};
 //ennemies entities
 Entity enemies[MAX_ENEMIES];
 
+//bullets
+Entity bullets[MAX_BULLETS];
+
 //count of ennemies still alive
 u16 enemiesLeft = 0;
+
+//count of bullets on screen
+u16 bulletsOnScreen = 0;
 
 //kill an entity
 void killEntity(Entity* e){
@@ -83,12 +90,59 @@ void positionEnemies(){
     }
 }
 
+//update bullets positions
+void positionBullets(){
+    u16 i = 0;
+    Entity *b;
+    for(i = 0; i < MAX_BULLETS; i++){
+        b = &bullets[i];
+        if(b->health > 0){
+          b->y += b->vely;
+            if(b->y + b->h < 0){
+                killEntity(b);
+                bulletsOnScreen--;
+            } else{
+                SPR_setPosition(b->sprite,b->x,b->y);
+            }  
+        }
+    }
+}
+
+//shoot a bullet
+void shootBullet(){
+    if( bulletsOnScreen < MAX_BULLETS ){
+        Entity* b;
+        u16 i = 0;
+        for(i=0; i<MAX_BULLETS; i++){
+            b = &bullets[i];
+            if(b->health == 0){
+
+                b->x = player.x+4;
+                b->y = player.y;
+
+                reviveEntity(b);
+                b->vely = -3;
+
+                SPR_setPosition(b->sprite,b->x,b->y);
+                bulletsOnScreen++;
+                break;
+            }
+        }	
+    }
+}
+
 //inputs handler that will be used
 void myJoyHandler( u16 joy, u16 changed, u16 state)
 {
     //for the joystick 1
     if (joy == JOY_1)
     {
+        //if B button is pressed once
+        if (state & BUTTON_B & changed)
+        {
+            //shoot a bullet
+            shootBullet();
+        }
         //if right button is pressed
         if (state & BUTTON_RIGHT)
 	    {
@@ -199,6 +253,24 @@ int main()
     //set color pal used for enemies
     VDP_setPaletteColor(34,RGB24_TO_VDPCOLOR(0x0078f8));
 
+    /*create bullets entities*/
+    //point to first ennemy
+    Entity* b = bullets;
+    //for each bullet
+    for(i = 0; i < MAX_BULLETS; i++){
+        //set position and size
+        b->x = 0;
+        b->y = -10;
+        b->w = 8;
+        b->h = 8;
+        //set sprite
+        b->sprite = SPR_addSprite(&bullet,bullets[0].x,bullets[0].y,TILE_ATTR(PAL1,0,FALSE,FALSE));
+        //set name
+        sprintf(b->name, "Bu%d",i);
+        //next bullet
+        b++;
+    }
+
 	while(1)
 	{
         //scroll background
@@ -207,10 +279,9 @@ int main()
         //to loop the background
         if(offset >= 256) offset = 0;
 
-        //update player position
+        //update entities positions
         positionPlayer();
-
-        //update enemies positions
+        positionBullets();
         positionEnemies();
 
         //update sprites
