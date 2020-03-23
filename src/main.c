@@ -42,6 +42,14 @@ u16 enemiesLeft = 0;
 //count of bullets on screen
 u16 bulletsOnScreen = 0;
 
+//is game finished
+bool finished = 0;
+
+//display text on screen
+void showText(char s[]){
+	VDP_drawText(s, 20 - strlen(s)/2 ,15);
+}
+
 //kill an entity
 void killEntity(Entity* e){
 	e->health = 0;
@@ -142,7 +150,9 @@ void checkCollisions(){
                 }
             }
             if(doesCollide(e, &player)){
-                
+                killEntity(&player);
+                finished = 1;
+                showText("Game over!");
             }
         }
     }
@@ -276,7 +286,7 @@ int main()
     for(i = 0; i < MAX_ENEMIES; i++){
         //set position, size, health
         e->x = i*32;
-        e->y = 32;
+        e->y = 128;
         e->w = 16;
         e->h = 16;
         e->velx = 1;
@@ -313,23 +323,29 @@ int main()
 
 	while(1)
 	{
-        //scroll background
-        SYS_disableInts();
-        VDP_setVerticalScroll(PLAN_B,offset -= 2);
-        //to loop the background
-        if(offset >= 256) offset = 0;
+        if(!finished){
+            //scroll background
+            SYS_disableInts();
+            VDP_setVerticalScroll(PLAN_B,offset -= 2);
+            //to loop the background
+            if(offset >= 256) offset = 0;
 
-        //update entities positions
-        positionPlayer();
-        positionBullets();
-        positionEnemies();
-        checkCollisions();
+            //update entities positions
+            positionPlayer();
+            positionBullets();
+            positionEnemies();
+            checkCollisions();
+            if(enemiesLeft == 0){
+                showText("You won!");
+                finished = 1;
+            }
 
-        //update sprites
-        SPR_update();
+            //update sprites
+            SPR_update();
 
-		VDP_waitVSync();
-        SYS_enableInts();
+            VDP_waitVSync();
+            SYS_enableInts();
+        }
 	}
 
 	return(0);
