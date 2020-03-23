@@ -108,6 +108,31 @@ void positionBullets(){
     }
 }
 
+//check collisions between bullets and ennemies
+void checkCollisions(){
+    u16 bi = 0;
+    Entity *b;
+    for(bi = 0; bi < MAX_BULLETS; bi++){
+        b = &bullets[bi];
+        if(b->health > 0){
+            u16 ei = 0;
+            Entity *e;
+            for(ei = 0; ei < MAX_ENEMIES; ei++){
+                e = &enemies[ei];
+                if(e->health > 0){
+                    if(b->x >= e->x && b->x <= e->x + e->w && b->y >= e->y && b->y <= e->y + e->h){
+                        killEntity(e);
+                        enemiesLeft--;
+                        killEntity(b);
+                        bulletsOnScreen--;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
 //shoot a bullet
 void shootBullet(){
     if( bulletsOnScreen < MAX_BULLETS ){
@@ -283,6 +308,7 @@ int main()
         positionPlayer();
         positionBullets();
         positionEnemies();
+        checkCollisions();
 
         //update sprites
         SPR_update();
