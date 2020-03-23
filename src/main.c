@@ -78,12 +78,15 @@ void positionEnemies(){
             //if the future position exceeds screen, change direction
             if( (e->x+e->w) > RIGHT_EDGE){
                 e->velx = -1;
+                e->y += e->h;
             }
             else if(e->x < LEFT_EDGE){
                 e->velx = 1;
+                e->y += e->h;
             }
             //add velocity to current position
             e->x += e->velx;
+            e->y += e->vely;
             //set sprite position
             SPR_setPosition(e->sprite,e->x,e->y);
         }
@@ -108,19 +111,28 @@ void positionBullets(){
     }
 }
 
+//return true if two entities collide
+bool doesCollide(Entity *a, Entity *b){
+    return a->x < b->x + b->w &&
+   a->x + a->w > b->x &&
+   a->y < b->y + b->h &&
+   a->h + a->y > b->y;
+}
+
 //check collisions between bullets and ennemies
 void checkCollisions(){
-    u16 bi = 0;
-    Entity *b;
-    for(bi = 0; bi < MAX_BULLETS; bi++){
-        b = &bullets[bi];
-        if(b->health > 0){
-            u16 ei = 0;
-            Entity *e;
-            for(ei = 0; ei < MAX_ENEMIES; ei++){
-                e = &enemies[ei];
-                if(e->health > 0){
-                    if(b->x >= e->x && b->x <= e->x + e->w && b->y >= e->y && b->y <= e->y + e->h){
+    u16 ei = 0;
+    Entity *e;
+    for(ei = 0; ei < MAX_ENEMIES; ei++){
+        e = &enemies[ei];
+        if(e->health > 0){
+            u16 bi = 0;
+            Entity *b;
+            for(bi = 0; bi < MAX_BULLETS; bi++){
+                b = &bullets[bi];
+                if(b->health > 0){
+                        //if enemy collide with a bullet both die
+                    if(doesCollide(e, b)){
                         killEntity(e);
                         enemiesLeft--;
                         killEntity(b);
@@ -128,6 +140,9 @@ void checkCollisions(){
                         break;
                     }
                 }
+            }
+            if(doesCollide(e, &player)){
+                
             }
         }
     }
