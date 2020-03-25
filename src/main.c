@@ -1,122 +1,17 @@
-#include <genesis.h>
-#include <resources.h>
-#include <kdebug.h>
+#include "game.h"
 
-//edges of the screen
-#define LEFT_EDGE 0
-#define RIGHT_EDGE 320
+//current powerup
+int currentPowerup;
 
-//indexes for ship when not moving and when moving
-#define ANIM_STRAIGHT 0
-#define ANIM_MOVE 1
+//time before powerup is off
+int powerupTimeLeft;
 
-//max number of ennemies and bullets on the screen
-#define MAX_ENEMIES 6
-#define MAX_BULLETS	3
-
-//entity structure (like player, ennemies, ect...)
-typedef struct {
-	int x;
-	int y;
-	int w;
-	int h;
-	int velx;
-	int vely;
-	int health;
-	char name[6];
-    Sprite* sprite;
-} Entity;
-
-//player entity
-Entity player = {0, 0, 16, 16, 0, 0, 0, "PLAYER"};
-
-//ennemies entities
-Entity enemies[MAX_ENEMIES];
-
-//bullets
-Entity bullets[MAX_BULLETS];
-
-//count of ennemies still alive
-u16 enemiesLeft = 0;
-
-//count of bullets on screen
-u16 bulletsOnScreen = 0;
-
-//is game finished
-bool finished = 0;
+//is powerup active
+int powerupActive = 0;
 
 //display text on screen
 void showText(char s[]){
 	VDP_drawText(s, 20 - strlen(s)/2 ,15);
-}
-
-//kill an entity
-void killEntity(Entity* e){
-	e->health = 0;
-	SPR_setVisibility(e->sprite,HIDDEN);
-}
-
-//revive an entity
-void reviveEntity(Entity* e){
-	e->health = 1;
-	SPR_setVisibility(e->sprite,VISIBLE);
-}
-
-//update player position (velocity is set by inputs handler)
-void positionPlayer(){
-    //add velocity to position
-    player.x += player.velx;
-
-    //if the position exceeds screen, set position to edge position
-    if(player.x < LEFT_EDGE) player.x = LEFT_EDGE;
-    if(player.x + player.w > RIGHT_EDGE) player.x = RIGHT_EDGE - player.w;
-
-    //set sprite position
-    SPR_setPosition(player.sprite,player.x,player.y);
-}
-
-//update ennemies positions
-void positionEnemies(){
-    u16 i = 0;
-    //for each ennemy
-    for(i = 0; i < MAX_ENEMIES; i++){
-        Entity* e = &enemies[i];
-        //if the ennemy is still alive
-        if(e->health > 0){
-            //if the future position exceeds screen, change direction
-            if( (e->x+e->w) > RIGHT_EDGE){
-                e->velx = -1;
-                e->y += e->h;
-            }
-            else if(e->x < LEFT_EDGE){
-                e->velx = 1;
-                e->y += e->h;
-            }
-            //add velocity to current position
-            e->x += e->velx;
-            e->y += e->vely;
-            //set sprite position
-            SPR_setPosition(e->sprite,e->x,e->y);
-        }
-    }
-}
-
-//update bullets positions
-void positionBullets(){
-    u16 i = 0;
-    Entity *b;
-    for(i = 0; i < MAX_BULLETS; i++){
-        b = &bullets[i];
-        if(b->health > 0){
-          b->y += b->vely;
-            if(b->y + b->h < 0){
-                killEntity(b);
-                bulletsOnScreen--;
-            } else{
-                SPR_setPosition(b->sprite,b->x,b->y);
-            }  
-        }
-    }
 }
 
 //return true if two entities collide
@@ -141,43 +36,20 @@ void checkCollisions(){
                 if(b->health > 0){
                         //if enemy collide with a bullet both die
                     if(doesCollide(e, b)){
-                        killEntity(e);
+                        kill_entity(e);
                         enemiesLeft--;
-                        killEntity(b);
-                        bulletsOnScreen--;
+                        destroyBullet(b);
+                        spawnPowerup(POWERUP_FIRE, e->x, e->y);
                         break;
                     }
                 }
             }
             if(doesCollide(e, &player)){
-                killEntity(&player);
+                kill_entity(&player);
                 finished = 1;
                 showText("Game over!");
             }
         }
-    }
-}
-
-//shoot a bullet
-void shootBullet(){
-    if( bulletsOnScreen < MAX_BULLETS ){
-        Entity* b;
-        u16 i = 0;
-        for(i=0; i<MAX_BULLETS; i++){
-            b = &bullets[i];
-            if(b->health == 0){
-
-                b->x = player.x+4;
-                b->y = player.y;
-
-                reviveEntity(b);
-                b->vely = -3;
-
-                SPR_setPosition(b->sprite,b->x,b->y);
-                bulletsOnScreen++;
-                break;
-            }
-        }	
     }
 }
 
@@ -227,6 +99,8 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
 
 int main()
 {
+    //is game finished
+    finished = 0;
     //init inputs
     JOY_init();
     //use the custom inputs handler
@@ -237,6 +111,8 @@ int main()
     //set his palette
     VDP_setPalette(PAL1, background.palette->data);
     SYS_enableInts();
+
+    SPR_init();
 
     //-random background
     //index used for tiles and ennemies
@@ -270,70 +146,25 @@ int main()
     SYS_enableInts();
 
     //load sprite engine
-    SPR_init();
-
-    /*Add the player*/
-    player.x = 152;
-    player.y = 192;
-    player.health = 1;
-    player.sprite = SPR_addSprite(&ship,player.x,player.y,TILE_ATTR(PAL1,0,FALSE,FALSE));
-    SPR_update();
-
-    /*Create all enemy*/
-    //point to first ennemy
-    Entity* e = enemies;
-    //for each enemy
-    for(i = 0; i < MAX_ENEMIES; i++){
-        //set position, size, health
-        e->x = i*32;
-        e->y = 128;
-        e->w = 16;
-        e->h = 16;
-        e->velx = 1;
-        e->health = 1;
-        //set sprite (using ship sprite but flipped toward player and with a different color pal)
-        e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
-        //set ennemy name
-        sprintf(e->name, "En%d",i);
-        //increment ennemy count
-        enemiesLeft++;
-        //next enemy
-        e++;
-    }
-    //set color pal used for enemies
-    VDP_setPaletteColor(34,RGB24_TO_VDPCOLOR(0x0078f8));
-
-    /*create bullets entities*/
-    //point to first ennemy
-    Entity* b = bullets;
-    //for each bullet
-    for(i = 0; i < MAX_BULLETS; i++){
-        //set position and size
-        b->x = 0;
-        b->y = -10;
-        b->w = 8;
-        b->h = 8;
-        //set sprite
-        b->sprite = SPR_addSprite(&bullet,bullets[0].x,bullets[0].y,TILE_ATTR(PAL1,0,FALSE,FALSE));
-        //set name
-        sprintf(b->name, "Bu%d",i);
-        //next bullet
-        b++;
-    }
-
+    player_init();
+    enemies_init();
+    powerups_init();
+    bullets_init();
 	while(1)
 	{
-        if(!finished){
+        if(finished==0){
             //scroll background
             SYS_disableInts();
             VDP_setVerticalScroll(PLAN_B,offset -= 2);
+            SYS_enableInts();
             //to loop the background
             if(offset >= 256) offset = 0;
 
             //update entities positions
-            positionPlayer();
-            positionBullets();
-            positionEnemies();
+            player_update();
+            bullets_update();
+            enemies_update();
+            powerups_update();
             checkCollisions();
             if(enemiesLeft == 0){
                 showText("You won!");
@@ -344,7 +175,6 @@ int main()
             SPR_update();
 
             VDP_waitVSync();
-            SYS_enableInts();
         }
 	}
 
