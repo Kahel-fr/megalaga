@@ -1,14 +1,5 @@
 #include "game.h"
 
-//current powerup
-int currentPowerup;
-
-//time before powerup is off
-int powerupTimeLeft;
-
-//is powerup active
-int powerupActive = 0;
-
 //display text on screen
 void showText(char s[]){
 	VDP_drawText(s, 20 - strlen(s)/2 ,15);
@@ -39,16 +30,23 @@ void checkCollisions(){
                         kill_entity(e);
                         enemiesLeft--;
                         destroyBullet(b);
-                        spawnPowerup(POWERUP_FIRE, e->x, e->y);
+                        if(!powerups_spawned && !powerups_active)
+                            powerups_spawn(POWERUP_FIRE, e->x, e->y);
                         break;
                     }
                 }
             }
             if(doesCollide(e, &player)){
                 kill_entity(&player);
-                finished = 1;
+                paused = 1;
                 showText("Game over!");
             }
+        }
+    }
+    if(powerups_spawned){
+        if(doesCollide(&player, powerups_current_spawned_entity)){
+            powerups_start();
+            kill_entity(powerups_current_spawned_entity);
         }
     }
 }
@@ -64,6 +62,10 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
         {
             //shoot a bullet
             shootBullet();
+        }
+        //if start button is pressed
+        if(state & BUTTON_START & changed){
+            paused = !paused;
         }
         //if right button is pressed
         if (state & BUTTON_RIGHT)
@@ -100,7 +102,7 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
 int main()
 {
     //is game finished
-    finished = 0;
+    paused = 0;
     //init inputs
     JOY_init();
     //use the custom inputs handler
@@ -152,7 +154,8 @@ int main()
     bullets_init();
 	while(1)
 	{
-        if(finished==0){
+        JOY_update();
+        if(!paused){
             //scroll background
             SYS_disableInts();
             VDP_setVerticalScroll(PLAN_B,offset -= 2);
@@ -168,7 +171,7 @@ int main()
             checkCollisions();
             if(enemiesLeft == 0){
                 showText("You won!");
-                finished = 1;
+                paused = 1;
             }
 
             //update sprites

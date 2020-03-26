@@ -1,3 +1,6 @@
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
+
 #include "game.h"
 
 //indexes for ship when not moving and when moving
@@ -13,3 +16,5 @@ void player_update();
 
 //shoot a bullet
 void shootBullet();
+
+#endif

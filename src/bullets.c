@@ -1,7 +1,7 @@
 #include "game.h"
 
 void bullets_init(){
-        u16 i = 0;
+    u16 i = 0;
         /*create bullets entities*/
     //point to first ennemy
     Entity* b = bullets;

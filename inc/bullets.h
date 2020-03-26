@@ -1,3 +1,5 @@
+#ifndef __BULLETS_H__
+#define __BULLETS_H__
 #include "game.h"
 
 #define MAX_BULLETS	3
@@ -12,3 +14,5 @@ void bullets_update();
 
 //destroy a bullet
 void destroyBullet(Entity* bullet);
+
+#endif

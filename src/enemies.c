@@ -27,7 +27,9 @@ void enemies_init(){
         e++;
     }
     //set color pal used for enemies
+    SYS_disableInts();
     VDP_setPaletteColor(34,RGB24_TO_VDPCOLOR(0x0078f8));
+    SYS_enableInts();
 }
 
 void enemies_update(){

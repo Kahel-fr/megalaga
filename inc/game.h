@@ -8,6 +8,7 @@
 #include "player.h"
 #include "bullets.h"
 #include "powerups.h"
+#include "powerups_fire.h"
 
 //edges of the screen
 #define LEFT_EDGE 0
@@ -16,6 +17,6 @@
 
 void showText(char s[]);
 
-bool finished;
+bool paused;
 
 #endif
