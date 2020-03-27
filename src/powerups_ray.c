@@ -34,7 +34,7 @@ bool powerups_ray_update(){
             for(ei = 0; ei < MAX_ENEMIES;ei++){
                 e = &enemies[ei];
                 if(doesCollide(raypart, e))
-                    kill_entity(e);
+                    enemies_take_damage(e, 1);
             }
         }
         else{

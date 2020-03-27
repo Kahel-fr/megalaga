@@ -16,7 +16,7 @@ void enemies_init(){
         e->w = 16;
         e->h = 16;
         e->velx = 1;
-        e->health = 1;
+        e->health = 5;
         //set sprite (using ship sprite but flipped toward player and with a different color pal)
         e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
         //set ennemy name
@@ -39,13 +39,8 @@ void enemies_update(){
         Entity* e = &enemies[i];
         //if the ennemy is still alive
         if(e->health > 0){
-            //if the future position exceeds screen, change direction
-            if( (e->x+e->w) > RIGHT_EDGE){
-                e->velx = -1;
-                e->y += e->h;
-            }
-            else if(e->x < LEFT_EDGE){
-                e->velx = 1;
+            if(e->x+e->w > RIGHT_EDGE || e->x < LEFT_EDGE){
+                e->velx = -e->velx;
                 e->y += e->h;
             }
             //add velocity to current position
@@ -54,5 +49,34 @@ void enemies_update(){
             //set sprite position
             SPR_setPosition(e->sprite,e->x,e->y);
         }
+    }
+}
+
+void ennemies_reset(){
+    enemiesLeft = 0;
+    u16 i = 0;
+    Entity* e = enemies;
+    for(i = 0; i < MAX_ENEMIES; i++){
+        e->x = i*32;
+        e->y = 16;
+        e->velx = wavesCount;
+        e->health = 5;
+        enemiesLeft++;
+        revive_entity(e);
+        e++;
+    }
+}
+
+void enemies_kill(Entity* e){
+    kill_entity(e);
+    enemiesLeft--;
+    if(!powerups_spawned && !powerups_active)
+        powerups_spawn(POWERUP_FIRE, e->x, e->y);
+}
+
+void enemies_take_damage(Entity* e, int damage){
+    e->health-=damage;
+    if(e->health<=0){
+        enemies_kill(e);
     }
 }

@@ -19,5 +19,8 @@
 void showText(char s[]);
 
 bool paused;
+int wavesCount;
+
+void loadWave();
 
 #endif

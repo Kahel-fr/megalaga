@@ -76,7 +76,7 @@ bool powerups_fire_update(){
                     KDebug_Alert("test");
                     e = &enemies[ei];
                     if(e->health >0 && doesCollide(b, e)){
-                        kill_entity(e);
+                        enemies_take_damage(e, 1);
                         kill_entity(b);
                     }
                 }

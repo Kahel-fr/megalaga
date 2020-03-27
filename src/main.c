@@ -27,11 +27,8 @@ void checkCollisions(){
                 if(b->health > 0){
                         //if enemy collide with a bullet both die
                     if(doesCollide(e, b)){
-                        kill_entity(e);
-                        enemiesLeft--;
+                        enemies_take_damage(e, 1);
                         destroyBullet(b);
-                        if(!powerups_spawned && !powerups_active)
-                            powerups_spawn(POWERUP_FIRE, e->x, e->y);
                         break;
                     }
                 }
@@ -99,10 +96,17 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
     }
 }
 
+void loadWave(){
+    ennemies_reset();
+    wavesCount++;
+}
+
 int main()
 {
     //is game finished
     paused = 0;
+
+    wavesCount = 1;
     //init inputs
     JOY_init();
     //use the custom inputs handler
@@ -152,7 +156,7 @@ int main()
     enemies_init();
     powerups_init();
     bullets_init();
-    //powerups_spawn(POWERUP_RAY, player.x, player.y - 30);
+    powerups_spawn(POWERUP_FIRE, player.x, player.y - 30);
 	while(1)
 	{
         JOY_update();
@@ -171,8 +175,7 @@ int main()
             powerups_update();
             checkCollisions();
             if(enemiesLeft == 0){
-                showText("You won!");
-                paused = 1;
+                loadWave();
             }
 
             //update sprites

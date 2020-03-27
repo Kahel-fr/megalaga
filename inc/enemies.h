@@ -12,7 +12,9 @@ Entity enemies[MAX_ENEMIES];
 u16 enemiesLeft;
 
 void enemies_init();
-
 void enemies_update();
+void ennemies_reset();
+void enemies_take_damage(Entity* e, int damage);
+void enemies_kill(Entity* e);
 
 #endif
