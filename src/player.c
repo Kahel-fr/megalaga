@@ -33,7 +33,7 @@ void shootBullet(){
             b = &bullets[i];
             if(b->health == 0){
 
-                b->x = player.x+4;
+                b->x = player.x+PLAYER_SHOOTING_OFFSET_Y;
                 b->y = player.y;
 
                 revive_entity(b);

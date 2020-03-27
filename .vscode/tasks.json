@@ -27,6 +27,15 @@
 
         },
         {
+            "suppressTaskName": true,
+            "echoCommand": true,
+            "taskName": "debug",
+            "args": [
+                "${env:GDK}\\bin\\make", "debug", "-f", "${env:GDK}\\makefile.gen"
+            ]
+
+        },
+        {
             "isBuildCommand": true,
             "suppressTaskName": true,
             "echoCommand": true,

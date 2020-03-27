@@ -152,6 +152,7 @@ int main()
     enemies_init();
     powerups_init();
     bullets_init();
+    //powerups_spawn(POWERUP_RAY, player.x, player.y - 30);
 	while(1)
 	{
         JOY_update();

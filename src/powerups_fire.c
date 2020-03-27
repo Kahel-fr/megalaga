@@ -19,12 +19,12 @@ void powerups_fire_init(){
 
 void powerups_fire_start(){
     powerups_fire_bullets_fired = 0;
-    timer = getTime(1);
+    powerups_fire_timer = getTime(1);
 }
 
 bool powerups_fire_update(){
     KDebug_AlertNumber(powerups_fire_bullets_fired);
-    if(powerups_fire_bullets_fired < POWERUPS_FIRE_BULLETS_NUMBER && (getTime(1) - timer) >= 30){
+    if(powerups_fire_bullets_fired < POWERUPS_FIRE_BULLETS_NUMBER && (getTime(1) - powerups_fire_timer) >= 30){
         Entity* b;
         u16 i = 0;
         for(i=0; i<POWERUPS_FIRE_BULLETS_NUMBER; i++){
@@ -54,7 +54,7 @@ bool powerups_fire_update(){
         }
         powerups_fire_bullets_on_screen++;
         powerups_fire_bullets_fired++;
-        timer = getTime(1);
+        powerups_fire_timer = getTime(1);
     }
     if(powerups_fire_bullets_on_screen>0){
         u16 i = 0;
@@ -72,7 +72,7 @@ bool powerups_fire_update(){
                 }  
                 u16 ei = 0;
                 Entity *e;
-                for(ei = 0; ei < enemiesLeft;ei++){
+                for(ei = 0; ei < MAX_ENEMIES;ei++){
                     KDebug_Alert("test");
                     e = &enemies[ei];
                     if(e->health >0 && doesCollide(b, e)){

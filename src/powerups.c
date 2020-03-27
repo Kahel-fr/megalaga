@@ -4,6 +4,7 @@ void powerups_init(){
     powerups_spawned = 0;
     powerups_active = 0;
     powerups_fire_init();
+    powerups_ray_init();
     /*create powerups entities*/
     int i = 0;
     Entity* p = powerups;
@@ -33,22 +34,22 @@ void powerups_update(){
             case POWERUP_FIRE:
                 powerups_active = powerups_fire_update();
             break;
+            case POWERUP_RAY:
+                powerups_active = powerups_ray_update();
+            break;
         }
     }
-    int i = 0;
-    Entity *p;
-    for(i = 0; i < POWERUPS_NUMBER; i++){
-        p = &powerups[i];
-        if(p->health>0){
-            p->y++;
-            if(p->y > BOTTOM_EDGE){
-                kill_entity(p);
-                powerups_spawned = 0;
-            }
-            else{
-                SPR_setPosition(p->sprite,p->x,p->y);
-                SPR_update();
-            }
+    else if(powerups_spawned){
+        int i = 0;
+        Entity *p = powerups_current_spawned_entity;
+        p->y++;
+        if(p->y > BOTTOM_EDGE){
+            kill_entity(p);
+            powerups_spawned = 0;
+        }
+        else{
+            SPR_setPosition(p->sprite,p->x,p->y);
+            SPR_update();
         }
     }
 }
@@ -70,6 +71,9 @@ void powerups_start(){
     switch(powerups_current){
         case POWERUP_FIRE:
             powerups_fire_start();
+        break;
+        case POWERUP_RAY:
+            powerups_ray_start();
         break;
     }
 }

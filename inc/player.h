@@ -7,6 +7,8 @@
 #define ANIM_STRAIGHT 0
 #define ANIM_MOVE 1
 
+#define PLAYER_SHOOTING_OFFSET_Y 4
+
 //player entity
 Entity player;
 

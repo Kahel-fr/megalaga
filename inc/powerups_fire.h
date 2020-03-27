@@ -7,7 +7,7 @@
 Entity powerups_fire_bullets[POWERUPS_FIRE_BULLETS_NUMBER];
 int powerups_fire_bullets_fired;
 int powerups_fire_bullets_on_screen;
-int timer;
+int powerups_fire_timer;
 
 void powerups_fire_init();
 void powerups_fire_start();
