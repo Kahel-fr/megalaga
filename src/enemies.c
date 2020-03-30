@@ -11,18 +11,14 @@ void enemies_init(){
     //for each enemy
     for(i = 0; i < MAX_ENEMIES; i++){
         //set position, size, health
-        e->x = i*32;
-        e->y = 16;
+        e->x = -20;
+        e->y = -20;
         e->w = 16;
         e->h = 16;
-        e->velx = 1;
-        e->health = 5;
         //set sprite (using ship sprite but flipped toward player and with a different color pal)
         e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
         //set ennemy name
         sprintf(e->name, "En%d",i);
-        //increment ennemy count
-        enemiesLeft++;
         //next enemy
         e++;
     }
@@ -54,27 +50,32 @@ void enemies_update(){
 
 void ennemies_reset(){
     enemiesLeft = 0;
+    int ennemies_count = ((wavesCount%MAX_ENEMIES));
+    int ennemies_speed = 1+wavesCount/MAX_ENEMIES;
+    int ennemies_health = ennemies_speed*2;
     u16 i = 0;
-    Entity* e = enemies;
-    for(i = 0; i < MAX_ENEMIES; i++){
+    Entity* e;;
+    for(i = 0; i < ennemies_count; i++){
+        e = &enemies[i];
         e->x = i*32;
         e->y = 16;
-        e->velx = wavesCount;
-        e->health = 5;
+        e->velx = ennemies_speed;
+        e->maxhealth = 5;
         enemiesLeft++;
         revive_entity(e);
-        e++;
     }
 }
 
 void enemies_kill(Entity* e){
     kill_entity(e);
-    enemiesLeft--;
+    if(enemiesLeft>0)
+        enemiesLeft--;
     if(!powerups_spawned && !powerups_active)
-        powerups_spawn(POWERUP_FIRE, e->x, e->y);
+        powerups_spawn_random(e->x, e->y);
 }
 
 void enemies_take_damage(Entity* e, int damage){
+    KDebug_Alert("damage");
     e->health-=damage;
     if(e->health<=0){
         enemies_kill(e);

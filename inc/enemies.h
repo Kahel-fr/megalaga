@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-#define MAX_ENEMIES 6
+#define MAX_ENEMIES 12
 
 //ennemies entities
 Entity enemies[MAX_ENEMIES];

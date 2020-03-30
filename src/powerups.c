@@ -21,6 +21,7 @@ void powerups_init(){
         }
         p->w = 16;
         p->h = 16;
+        p->maxhealth = 1;
         p++;
     }
     SYS_disableInts();
@@ -76,4 +77,9 @@ void powerups_start(){
             powerups_ray_start();
         break;
     }
+}
+
+void powerups_spawn_random(int x, int y){
+    int powerup = (random() %  (2-1+1));
+    powerups_spawn(powerup, x, y);
 }

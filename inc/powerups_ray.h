@@ -3,7 +3,7 @@
 #include "game.h"
 
 #define POWERUP_RAY_LENGTH 12
-#define POWERUP_RAY_TIME 1000
+#define POWERUP_RAY_TIME 1500
 
 Entity powerups_ray_parts[POWERUP_RAY_LENGTH];
 int powerups_ray_timer;

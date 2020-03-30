@@ -8,6 +8,7 @@ void powerups_ray_init(){
         raypart->y = -20;
         raypart->h = 16;
         raypart->w = 16;
+        raypart->maxhealth = 1;
         raypart->sprite = SPR_addSprite(&ray, raypart->x, raypart->y, TILE_ATTR(PAL3,0,FALSE,FALSE));
     }
 }
@@ -33,8 +34,10 @@ bool powerups_ray_update(){
             Entity *e;
             for(ei = 0; ei < MAX_ENEMIES;ei++){
                 e = &enemies[ei];
-                if(doesCollide(raypart, e))
-                    enemies_take_damage(e, 1);
+                if(e->health>0){
+                    if(doesCollide(raypart, e) && (currentTime % 15) <= 1)
+                        enemies_take_damage(e, 1);
+                }
             }
         }
         else{

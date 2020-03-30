@@ -54,6 +54,15 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
     //for the joystick 1
     if (joy == JOY_1)
     {
+        //DEBUG TO REMOVE
+        if (state & BUTTON_A & changed)
+        {
+            Entity* e;
+            for(int i = 0; i < MAX_ENEMIES; i++){
+                e = &enemies[i];
+                enemies_kill(e);
+            }
+        }
         //if B button is pressed once
         if (state & BUTTON_B & changed)
         {
@@ -106,7 +115,7 @@ int main()
     //is game finished
     paused = 0;
 
-    wavesCount = 1;
+    wavesCount = 0;
     //init inputs
     JOY_init();
     //use the custom inputs handler
@@ -156,7 +165,8 @@ int main()
     enemies_init();
     powerups_init();
     bullets_init();
-    powerups_spawn(POWERUP_FIRE, player.x, player.y - 30);
+    loadWave();
+    powerups_spawn(POWERUP_RAY, player.x, player.y-10);
 	while(1)
 	{
         JOY_update();

@@ -9,6 +9,7 @@ typedef struct {
 	int h;
 	int velx;
 	int vely;
+	int maxhealth;
 	int health;
 	char name[6];
     Sprite* sprite;

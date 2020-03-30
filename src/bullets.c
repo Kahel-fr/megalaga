@@ -12,6 +12,7 @@ void bullets_init(){
         b->y = -10;
         b->w = 8;
         b->h = 8;
+        b->maxhealth = 1;
         //set sprite
         b->sprite = SPR_addSprite(&bullet,bullets[0].x,bullets[0].y,TILE_ATTR(PAL1,0,FALSE,FALSE));
         //set name

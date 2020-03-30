@@ -24,4 +24,5 @@ void powerups_start();
 void powerups_update();
 //spawn a powerup
 void powerups_spawn(int powerup, int x, int y);
+void powerups_spawn_random(int x, int y);
 #endif

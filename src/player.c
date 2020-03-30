@@ -32,7 +32,6 @@ void shootBullet(){
         for(i=0; i<MAX_BULLETS; i++){
             b = &bullets[i];
             if(b->health == 0){
-
                 b->x = player.x+PLAYER_SHOOTING_OFFSET_Y;
                 b->y = player.y;
 
