@@ -162,13 +162,13 @@ int main()
 
     //load sprite engine
     player_init();
-    //enemies_init();
-    //powerups_init();
-    //bullets_init();
-    //loadWave();
+    enemies_init();
+    powerups_init();
+    bullets_init();
+    loadWave();
 
     SYS_disableInts();
-    VDP_setPalette(PAL3, powerup_pal->data);
+    VDP_setPalette(PAL3, powerup_pal.data);
     SYS_enableInts();
     Sprite* ufotest = SPR_addSprite(&ufo,player.x,player.y-100,TILE_ATTR(PAL3,0,FALSE,FALSE));
 	while(1)
@@ -183,11 +183,11 @@ int main()
             if(offset >= 256) offset = 0;
 
             //update entities positions
-            /*player_update();
+            player_update();
             bullets_update();
             enemies_update();
             powerups_update();
-            checkCollisions();*/
+            checkCollisions();
             if(enemiesLeft == 0){
                 loadWave();
             }
