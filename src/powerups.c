@@ -24,9 +24,6 @@ void powerups_init(){
         p->maxhealth = 1;
         p++;
     }
-    SYS_disableInts();
-    VDP_setPalette(PAL3, powerup_pal.data);
-    SYS_enableInts();
 }
 
 void powerups_update(){
@@ -80,6 +77,6 @@ void powerups_start(){
 }
 
 void powerups_spawn_random(int x, int y){
-    int powerup = (random() %  (2-1+1));
+    int powerup = (random() %  (POWERUPS_NUMBER-1+1));
     powerups_spawn(powerup, x, y);
 }

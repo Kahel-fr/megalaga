@@ -70,7 +70,7 @@ void enemies_kill(Entity* e){
     kill_entity(e);
     if(enemiesLeft>0)
         enemiesLeft--;
-    if(!powerups_spawned && !powerups_active)
+    if(!powerups_spawned && !powerups_active && (random() % 2)==0)
         powerups_spawn_random(e->x, e->y);
 }
 
