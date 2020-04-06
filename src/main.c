@@ -7,6 +7,7 @@ void showText(char s[]){
 
 //return true if two entities collide
 bool doesCollide(Entity *a, Entity *b){
+    //KLog(a->name);
     return a->x < b->x + b->w &&
    a->x + a->w > b->x &&
    a->y < b->y + b->h &&
@@ -106,16 +107,22 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
 }
 
 void loadWave(){
-    ennemies_reset();
     wavesCount++;
+    if(wavesCount % 10 == 0){
+        boss_init();
+        isBossWave = 1;
+    }
+    else
+        ennemies_reset();
 }
 
 int main()
 {
     //is game finished
     paused = 0;
-
     wavesCount = 0;
+    isBossWave = 0;
+
     //init inputs
     JOY_init();
     //use the custom inputs handler
@@ -170,7 +177,7 @@ int main()
     SYS_disableInts();
     VDP_setPalette(PAL3, powerup_pal.data);
     SYS_enableInts();
-    Sprite* ufotest = SPR_addSprite(&ufo,player.x,player.y-100,TILE_ATTR(PAL3,0,FALSE,FALSE));
+
 	while(1)
 	{
         JOY_update();
@@ -185,7 +192,10 @@ int main()
             //update entities positions
             player_update();
             bullets_update();
-            enemies_update();
+            if(isBossWave)
+                boss_update();
+            else
+                enemies_update();
             powerups_update();
             checkCollisions();
             if(enemiesLeft == 0){

@@ -21,6 +21,7 @@ void showText(char s[]);
 
 bool paused;
 int wavesCount;
+bool isBossWave;
 
 void loadWave();
 

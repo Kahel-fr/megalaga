@@ -9,6 +9,7 @@ void player_init(){
     player.y = 192;
     player.health = 1;
     player.sprite = SPR_addSprite(&ship,player.x,player.y,TILE_ATTR(PAL1,0,FALSE,FALSE));
+    KLog(player.x);
     sprintf(player.name, "PLAYER");
 }
 

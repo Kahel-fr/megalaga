@@ -8,7 +8,6 @@ void kill_entity(Entity* e){
 
 //revive an entity
 void revive_entity(Entity* e){
-	KLog("test");
 	e->health = e->maxhealth;
 	SPR_setVisibility(e->sprite,VISIBLE);
 }

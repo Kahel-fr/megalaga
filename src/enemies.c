@@ -75,7 +75,6 @@ void enemies_kill(Entity* e){
 }
 
 void enemies_take_damage(Entity* e, int damage){
-    KDebug_Alert("damage");
     e->health-=damage;
     if(e->health<=0){
         enemies_kill(e);
