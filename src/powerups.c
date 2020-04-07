@@ -47,7 +47,6 @@ void powerups_update(){
         }
         else{
             SPR_setPosition(p->sprite,p->x,p->y);
-            SPR_update();
         }
     }
 }

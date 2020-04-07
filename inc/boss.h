@@ -2,7 +2,7 @@
 #define __BOSS_H__
 #include "game.h"
 
-#define BOSS_PHASES_NUMBER 3
+#define BOSS_PHASES_NUMBER 4
 #define BOSS_HEALTH_BY_PHASE 10
 
 Entity boss_entity;

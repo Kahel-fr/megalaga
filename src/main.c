@@ -167,16 +167,16 @@ int main()
     VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
     SYS_enableInts();
 
+    SYS_disableInts();
+        VDP_setPalette(PAL3, powerup_pal.data);
+    SYS_enableInts();
+
     //load sprite engine
     player_init();
     enemies_init();
     powerups_init();
     bullets_init();
     loadWave();
-
-    SYS_disableInts();
-    VDP_setPalette(PAL3, powerup_pal.data);
-    SYS_enableInts();
 
 	while(1)
 	{
@@ -191,7 +191,7 @@ int main()
 
             //update entities positions
             player_update();
-            bullets_update();
+            //bullets_update();
             if(isBossWave)
                 boss_update();
             else
