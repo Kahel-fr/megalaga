@@ -130,6 +130,7 @@ int main()
     //load tile
     SYS_disableInts();
     VDP_loadTileSet(background.tileset,1,DMA);
+    VDP_loadTileSet(heart.tileset,5,DMA);
     //set his palette
     VDP_setPalette(PAL1, background.palette->data);
     SYS_enableInts();
