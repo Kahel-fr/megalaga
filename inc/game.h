@@ -3,6 +3,7 @@
 #include <genesis.h>
 #include <kdebug.h>
 #include <resources.h>
+#include "hud.h"
 #include "entity.h"
 #include "enemies.h"
 #include "player.h"

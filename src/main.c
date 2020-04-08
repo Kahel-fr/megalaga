@@ -191,7 +191,7 @@ int main()
 
             //update entities positions
             player_update();
-            //bullets_update();
+            bullets_update();
             if(isBossWave)
                 boss_update();
             else
@@ -204,6 +204,8 @@ int main()
 
             //update sprites
             SPR_update();
+
+            hud_print();
 
             VDP_waitVSync();
         }
