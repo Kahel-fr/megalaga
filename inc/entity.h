@@ -17,5 +17,6 @@ typedef struct {
 
 void kill_entity(Entity* e);
 void revive_entity(Entity* e);
+void entity_take_damage(Entity* e, int damage);
 
 #endif

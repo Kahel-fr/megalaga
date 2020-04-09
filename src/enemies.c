@@ -75,7 +75,7 @@ void enemies_kill(Entity* e){
 }
 
 void enemies_take_damage(Entity* e, int damage){
-    e->health-=damage;
+    entity_take_damage(e, damage);
     if(e->health<=0){
         enemies_kill(e);
     }

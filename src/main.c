@@ -35,9 +35,13 @@ void checkCollisions(){
                 }
             }
             if(doesCollide(e, &player)){
-                kill_entity(&player);
-                paused = 1;
-                showText("Game over!");
+                entity_take_damage(&player, 1);
+                kill_entity(e);
+                hud_print();
+                if(player.health = 0){
+                    paused = 1;
+                    showText("Game over!");
+                }
             }
         }
     }
@@ -178,6 +182,7 @@ int main()
     powerups_init();
     bullets_init();
     loadWave();
+    hud_print();
 
 	while(1)
 	{
@@ -201,12 +206,11 @@ int main()
             checkCollisions();
             if(enemiesLeft == 0){
                 loadWave();
+                hud_print();
             }
 
             //update sprites
             SPR_update();
-
-            hud_print();
 
             VDP_waitVSync();
         }
