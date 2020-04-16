@@ -15,3 +15,8 @@ void revive_entity(Entity* e){
 void entity_take_damage(Entity* e, int damage){
 	e->health-=damage;
 }
+
+void entity_delete(Entity* e){
+	SPR_releaseSprite(e->sprite);
+	//MEM_free(e);
+}

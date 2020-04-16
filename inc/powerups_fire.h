@@ -12,5 +12,6 @@ int powerups_fire_timer;
 void powerups_fire_init();
 void powerups_fire_start();
 bool powerups_fire_update();
+void powerups_fire_shootone(Entity* b);
 
 #endif

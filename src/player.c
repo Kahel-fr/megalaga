@@ -27,7 +27,7 @@ void player_update(){
 
 //shoot a bullet
 void shootBullet(){
-    if( bulletsOnScreen < MAX_BULLETS ){
+    /*if( bulletsOnScreen < MAX_BULLETS ){
         Entity* b;
         u16 i = 0;
         for(i=0; i<MAX_BULLETS; i++){
@@ -43,6 +43,7 @@ void shootBullet(){
                 bulletsOnScreen++;
                 break;
             }
-        }	
-    }
+        }
+    }*/
+    bullets_spawn(player.x, player.y);
 }

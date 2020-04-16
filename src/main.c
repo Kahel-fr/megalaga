@@ -18,21 +18,24 @@ bool doesCollide(Entity *a, Entity *b){
 void checkCollisions(){
     u16 ei = 0;
     Entity *e;
-    for(ei = 0; ei < MAX_ENEMIES; ei++){
-        e = &enemies[ei];
-        if(e->health > 0){
+    for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+        Entity* e = (Entity*)tmp->data;
+        if(e->health > 0 && !e->isInvincible){
             u16 bi = 0;
             Entity *b;
-            for(bi = 0; bi < MAX_BULLETS; bi++){
-                b = &bullets[bi];
-                if(b->health > 0){
-                        //if enemy collide with a bullet both die
+            for(t_element *tmp = container_bullets->first; tmp != NULL; tmp = tmp->next){
+                Entity* b = (Entity*)tmp->data;
                     if(doesCollide(e, b)){
-                        enemies_take_damage(e, 1);
-                        destroyBullet(b);
-                        break;
+                        switch(b->type){
+                            case ENTITY_RAY:
+                                powerups_ray_hit(e);
+                            break;
+                            default:
+                                enemies_take_damage(e, 1);
+                                bullets_kill(b);
+                            break;
+                        }
                     }
-                }
             }
             if(doesCollide(e, &player)){
                 entity_take_damage(&player, 1);
@@ -44,6 +47,7 @@ void checkCollisions(){
                 }
             }
         }
+
     }
     if(powerups_spawned){
         if(doesCollide(&player, powerups_current_spawned_entity)){
@@ -63,9 +67,9 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
         if (state & BUTTON_A & changed)
         {
             Entity* e;
-            for(int i = 0; i < MAX_ENEMIES; i++){
-                e = &enemies[i];
-                enemies_kill(e);
+            for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+                Entity* e = (Entity*)tmp->data;
+                entity_take_damage(e, 999);
             }
         }
         //if B button is pressed once
@@ -124,7 +128,7 @@ int main()
 {
     //is game finished
     paused = 0;
-    wavesCount = 0;
+    wavesCount = 9;
     isBossWave = 0;
 
     //init inputs
@@ -179,11 +183,10 @@ int main()
     //load sprite engine
     player_init();
     enemies_init();
-    powerups_init();
     bullets_init();
+    powerups_init();
     loadWave();
     hud_print();
-
 	while(1)
 	{
         JOY_update();
@@ -200,8 +203,7 @@ int main()
             bullets_update();
             if(isBossWave)
                 boss_update();
-            else
-                enemies_update();
+            enemies_update();
             powerups_update();
             checkCollisions();
             if(enemiesLeft == 0){

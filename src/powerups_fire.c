@@ -26,32 +26,27 @@ void powerups_fire_start(){
 bool powerups_fire_update(){
     if(powerups_fire_bullets_fired < POWERUPS_FIRE_BULLETS_NUMBER && (getTime(1) - powerups_fire_timer) >= 30){
         Entity* b;
-        u16 i = 0;
-        for(i=0; i<POWERUPS_FIRE_BULLETS_NUMBER; i++){
-            b = &powerups_fire_bullets[i];
-            if(b->health == 0){
+        b = &powerups_fire_bullets[powerups_fire_bullets_fired];
 
-                b->x = player.x+4;
-                b->y = player.y;
+        b->health = 1;
+        b->x = player.x+4;
+        b->y = player.y;
 
-                revive_entity(b);
-                switch(powerups_fire_bullets_fired%3){
-                    case 0:
-                        b->velx = 0;
-                    break;
-                    case 1:
-                        b->velx = -1;
-                    break;
-                    case 2:
-                        b->velx = 1;
-                    break;
-                }
-                b->vely = -3;
-
-                SPR_setPosition(b->sprite,b->x,b->y);
-                break;
-            }
+        switch(powerups_fire_bullets_fired%3){
+            case 0:
+                b->velx = 0;
+            break;
+            case 1:
+                b->velx = -1;
+            break;
+            case 2:
+                b->velx = 1;
+            break;
         }
+        b->vely = -3;
+
+        SPR_setPosition(b->sprite,b->x,b->y);
+        powerups_fire_shootone(b);
         powerups_fire_bullets_on_screen++;
         powerups_fire_bullets_fired++;
         powerups_fire_timer = getTime(1);
@@ -70,17 +65,13 @@ bool powerups_fire_update(){
                 } else{
                     SPR_setPosition(b->sprite,b->x,b->y);
                 }  
-                u16 ei = 0;
-                Entity *e;
-                for(ei = 0; ei < MAX_ENEMIES;ei++){
-                    e = &enemies[ei];
-                    if(e->health >0 && doesCollide(b, e)){
-                        enemies_take_damage(e, 1);
-                        kill_entity(b);
-                    }
-                }
             }
         }
     }
     return (powerups_fire_bullets_fired < POWERUPS_FIRE_BULLETS_NUMBER)||powerups_fire_bullets_on_screen>0;
+}
+
+void powerups_fire_shootone(Entity* b){
+    t_element * obj = create_element(b);
+    add_element_to_container(container_bullets, obj);
 }

@@ -6,7 +6,7 @@
 #define MAX_ENEMIES 12
 
 //ennemies entities
-Entity enemies[MAX_ENEMIES];
+t_container* container_enemies;
 
 //count of ennemies still alive
 u16 enemiesLeft;

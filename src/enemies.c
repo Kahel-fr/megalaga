@@ -2,26 +2,10 @@
 
 void enemies_init(){
 
+    container_enemies = add_container_to_game();
     //count of ennemies still alive
     enemiesLeft = 0;
-    /*Create all enemy*/
-        u16 i = 0;
-    //point to first ennemy
-    Entity* e = enemies;
-    //for each enemy
-    for(i = 0; i < MAX_ENEMIES; i++){
-        //set position, size, health
-        e->x = -20;
-        e->y = -20;
-        e->w = 16;
-        e->h = 16;
-        //set sprite (using ship sprite but flipped toward player and with a different color pal)
-        e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
-        //set ennemy name
-        sprintf(e->name, "En%d",i);
-        //next enemy
-        e++;
-    }
+
     //set color pal used for enemies
     SYS_disableInts();
     VDP_setPaletteColor(34,RGB24_TO_VDPCOLOR(0x0078f8));
@@ -29,40 +13,55 @@ void enemies_init(){
 }
 
 void enemies_update(){
-    u16 i = 0;
-    //for each ennemy
-    for(i = 0; i < MAX_ENEMIES; i++){
-        Entity* e = &enemies[i];
-        //if the ennemy is still alive
-        if(e->health > 0){
-            if(e->x+e->w > RIGHT_EDGE || e->x < LEFT_EDGE){
-                e->velx = -e->velx;
-                e->y += e->h;
+    for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+        Entity* e = (Entity*)tmp->data;
+        if(e->type == ENTITY_ENNEMY){
+            if(e->health > 0){
+                if(e->x+e->w > RIGHT_EDGE || e->x < LEFT_EDGE){
+                    e->velx = -e->velx;
+                    e->y += e->h;
+                }
+                //add velocity to current position
+                e->x += e->velx;
+                e->y += e->vely;
+                //set sprite position
+                SPR_setPosition(e->sprite,e->x,e->y);
             }
-            //add velocity to current position
-            e->x += e->velx;
-            e->y += e->vely;
-            //set sprite position
-            SPR_setPosition(e->sprite,e->x,e->y);
+            else{
+                /*if(!powerups_spawned && !powerups_active && (random() % 2)==0)
+                    powerups_spawn_random(e->x, e->y);*/
+                KLog("die");
+                SPR_releaseSprite(e->sprite);
+                del_element_from_container(container_enemies, tmp);
+                enemiesLeft--;
+            }
         }
     }
 }
 
 void ennemies_reset(){
+    //KLog("reset");
     enemiesLeft = 0;
     int ennemies_count = ((wavesCount%MAX_ENEMIES));
     int ennemies_speed = 1+wavesCount/MAX_ENEMIES;
     int ennemies_health = ennemies_speed*2;
-    u16 i = 0;
-    Entity* e;;
-    for(i = 0; i < ennemies_count; i++){
-        e = &enemies[i];
+    for (u16 i = 0; i < ennemies_count;i++) 
+    {
+        Entity *e = MEM_alloc(sizeof(Entity));
+        e->type = ENTITY_ENNEMY;
         e->x = i*32;
         e->y = 16;
+        e->w = 16;
+        e->h = 16;
         e->velx = ennemies_speed;
-        e->maxhealth = 5;
+        e->maxhealth = ennemies_health;
+        e->health = e->maxhealth;
+        e->sprite = SPR_addSprite(&ship,e->x,e->y,TILE_ATTR(PAL2,0,TRUE,FALSE));
+        sprintf(e->name, "En%d",i);
+        t_element * obj = create_element(e);
+        add_element_to_container(container_enemies, obj);
         enemiesLeft++;
-        revive_entity(e);
+        i++;
     }
 }
 
@@ -70,13 +69,9 @@ void enemies_kill(Entity* e){
     kill_entity(e);
     if(enemiesLeft>0)
         enemiesLeft--;
-    if(!powerups_spawned && !powerups_active && (random() % 2)==0)
-        powerups_spawn_random(e->x, e->y);
+    //entity_delete(e);
 }
 
 void enemies_take_damage(Entity* e, int damage){
     entity_take_damage(e, damage);
-    if(e->health<=0){
-        enemies_kill(e);
-    }
 }
