@@ -13,7 +13,7 @@ u16 bulletsOnScreen;
 
 void bullets_init();
 void bullets_update();
-void bullets_spawn(int x, int y);
+void bullets_spawn(int x, int y, bool shotByEnnemy);
 void bullets_kill(Entity* b);
 
 //destroy a bullet

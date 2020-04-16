@@ -45,5 +45,5 @@ void shootBullet(){
             }
         }
     }*/
-    bullets_spawn(player.x, player.y);
+    bullets_spawn(player.x, player.y, 0);
 }

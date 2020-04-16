@@ -26,11 +26,11 @@ void enemies_update(){
                 e->y += e->vely;
                 //set sprite position
                 SPR_setPosition(e->sprite,e->x,e->y);
+                enemies_random_shoot(e);
             }
             else{
-                /*if(!powerups_spawned && !powerups_active && (random() % 2)==0)
-                    powerups_spawn_random(e->x, e->y);*/
-                KLog("die");
+                if(!powerups_spawned && !powerups_active && (random() % 2)==0)
+                    powerups_spawn_random(e->x, e->y);
                 SPR_releaseSprite(e->sprite);
                 del_element_from_container(container_enemies, tmp);
                 enemiesLeft--;
@@ -63,6 +63,7 @@ void ennemies_reset(){
         enemiesLeft++;
         i++;
     }
+    timer = getTime(0);
 }
 
 void enemies_kill(Entity* e){
@@ -74,4 +75,11 @@ void enemies_kill(Entity* e){
 
 void enemies_take_damage(Entity* e, int damage){
     entity_take_damage(e, damage);
+}
+
+void enemies_random_shoot(Entity* e){
+    if(getTime(0)-timer>200 && (random() % 10)==0){
+        bullets_spawn(e->x, e->y, 1);
+        timer = getTime(0);
+    }
 }

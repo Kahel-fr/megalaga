@@ -18,13 +18,19 @@ bool doesCollide(Entity *a, Entity *b){
 void checkCollisions(){
     u16 ei = 0;
     Entity *e;
-    for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
-        Entity* e = (Entity*)tmp->data;
-        if(e->health > 0 && !e->isInvincible){
-            u16 bi = 0;
-            Entity *b;
-            for(t_element *tmp = container_bullets->first; tmp != NULL; tmp = tmp->next){
-                Entity* b = (Entity*)tmp->data;
+    for(t_element *tmp = container_bullets->first; tmp != NULL; tmp = tmp->next){
+        Entity* b = (Entity*)tmp->data;
+        if(b->type==ENTITY_ENNEMY_BULLET){
+            if(doesCollide(&player, b)){
+                entity_take_damage(&player, 1);
+                bullets_kill(b);
+                hud_print();
+            }
+        }
+        else
+        for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+            Entity* e = (Entity*)tmp->data;
+            if(e->health > 0 && !e->isInvincible){
                     if(doesCollide(e, b)){
                         switch(b->type){
                             case ENTITY_RAY:
@@ -37,18 +43,9 @@ void checkCollisions(){
                         }
                     }
             }
-            if(doesCollide(e, &player)){
-                entity_take_damage(&player, 1);
-                kill_entity(e);
-                hud_print();
-                if(player.health = 0){
-                    paused = 1;
-                    showText("Game over!");
-                }
-            }
         }
-
     }
+
     if(powerups_spawned){
         if(doesCollide(&player, powerups_current_spawned_entity)){
             powerups_start();
@@ -128,7 +125,7 @@ int main()
 {
     //is game finished
     paused = 0;
-    wavesCount = 9;
+    wavesCount = 3;
     isBossWave = 0;
 
     //init inputs
