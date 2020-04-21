@@ -29,7 +29,7 @@ void enemies_update(){
                 enemies_random_shoot(e);
             }
             else{
-                if(!powerups_spawned && !powerups_active && (random() % 2)==0)
+                if(!isBossWave && !powerups_spawned && !powerups_active && (random() % 2)==0)
                     powerups_spawn_random(e->x, e->y);
                 SPR_releaseSprite(e->sprite);
                 del_element_from_container(container_enemies, tmp);
@@ -39,8 +39,16 @@ void enemies_update(){
     }
 }
 
+void ennemies_clear(){
+    for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+        Entity* e = (Entity*)tmp->data;
+        SPR_releaseSprite(e->sprite);
+        del_element_from_container(container_enemies, tmp);
+    }
+    enemiesLeft = 0;
+}
+
 void ennemies_reset(){
-    //KLog("reset");
     enemiesLeft = 0;
     int ennemies_count = ((wavesCount%MAX_ENEMIES));
     int ennemies_speed = 1+wavesCount/MAX_ENEMIES;
@@ -75,6 +83,8 @@ void enemies_kill(Entity* e){
 
 void enemies_take_damage(Entity* e, int damage){
     entity_take_damage(e, damage);
+    if(e->type == ENTITY_BOSS)
+        hud_print();
 }
 
 void enemies_random_shoot(Entity* e){

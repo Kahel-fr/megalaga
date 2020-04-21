@@ -13,6 +13,7 @@
 Entity player;
 
 void player_init();
+void player_reset();
 
 void player_update();
 

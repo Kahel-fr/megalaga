@@ -7,11 +7,17 @@ void showText(char s[]){
 
 //return true if two entities collide
 bool doesCollide(Entity *a, Entity *b){
-    //KLog(a->name);
     return a->x < b->x + b->w &&
    a->x + a->w > b->x &&
    a->y < b->y + b->h &&
    a->h + a->y > b->y;
+}
+
+void get_direction_between_two_points(int start_x, int start_y, int end_x, int end_y, fix16* velx, fix16* vely){
+    int distance = getApproximatedDistance(end_x - start_x, end_y - start_y);
+    if(distance==0) distance = 1;
+    *velx = fix16Div(fix16Sub(intToFix16(end_x), intToFix16(start_x)), intToFix16(distance));
+    *vely = fix16Div(fix16Sub(intToFix16(end_y), intToFix16(start_y)), intToFix16(distance));
 }
 
 //check collisions between bullets and ennemies
@@ -20,28 +26,36 @@ void checkCollisions(){
     Entity *e;
     for(t_element *tmp = container_bullets->first; tmp != NULL; tmp = tmp->next){
         Entity* b = (Entity*)tmp->data;
-        if(b->type==ENTITY_ENNEMY_BULLET){
+        if(b->type==ENTITY_ENNEMY_BULLET || b->type==ENTITY_BOSS_PROJECTILE){
             if(doesCollide(&player, b)){
                 entity_take_damage(&player, 1);
                 bullets_kill(b);
                 hud_print();
             }
         }
-        else
-        for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
-            Entity* e = (Entity*)tmp->data;
-            if(e->health > 0 && !e->isInvincible){
-                    if(doesCollide(e, b)){
-                        switch(b->type){
-                            case ENTITY_RAY:
-                                powerups_ray_hit(e);
-                            break;
-                            default:
-                                enemies_take_damage(e, 1);
-                                bullets_kill(b);
-                            break;
+        else{
+            if(boss_projectile_spawned && !boss_projectile_is_reflected && doesCollide(&boss_projectile_entity, b)){
+                boss_projectile_hit_by_player();
+                bullets_kill(b);
+            }
+            else{
+                for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
+                    Entity* e = (Entity*)tmp->data;
+                    if(e->health > 0 && !e->isInvincible){
+                        if(doesCollide(e, b)){
+                            //KDebug_AlertNumber(b->type);
+                            switch(b->type){
+                                case ENTITY_RAY:
+                                    powerups_ray_hit(e);
+                                break;
+                                default:
+                                    enemies_take_damage(e, 1);
+                                    bullets_kill(b);
+                                break;
+                            }
                         }
                     }
+                }
             }
         }
     }
@@ -63,11 +77,12 @@ void myJoyHandler( u16 joy, u16 changed, u16 state)
         //DEBUG TO REMOVE
         if (state & BUTTON_A & changed)
         {
-            Entity* e;
+            /*Entity* e;
             for (t_element *tmp = container_enemies->first; tmp != NULL; tmp = tmp->next) {
                 Entity* e = (Entity*)tmp->data;
                 entity_take_damage(e, 999);
-            }
+            }*/
+            powerups_spawn(POWERUP_FIRE, player.x, player.y-20);
         }
         //if B button is pressed once
         if (state & BUTTON_B & changed)
@@ -121,12 +136,22 @@ void loadWave(){
         ennemies_reset();
 }
 
+void game_reset(){
+    paused = 0;
+    wavesCount = 9;
+    isBossWave = 0;
+    ennemies_clear();
+    player_reset();
+    loadWave();
+    hud_print();
+}
+
+void game_over(){
+    game_reset();
+}
+
 int main()
 {
-    //is game finished
-    paused = 0;
-    wavesCount = 3;
-    isBossWave = 0;
 
     //init inputs
     JOY_init();
@@ -182,8 +207,9 @@ int main()
     enemies_init();
     bullets_init();
     powerups_init();
-    loadWave();
-    hud_print();
+
+    game_reset();
+
 	while(1)
 	{
         JOY_update();
@@ -207,6 +233,8 @@ int main()
                 loadWave();
                 hud_print();
             }
+            if(player.health<1)
+                game_over();
 
             //update sprites
             SPR_update();

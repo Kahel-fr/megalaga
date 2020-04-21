@@ -8,6 +8,7 @@
 Entity powerups_ray_parts[POWERUP_RAY_LENGTH];
 t_container* container_powerup_rayparts;
 int powerups_ray_timer;
+int powerups_ray_cooldown;
 
 void powerups_ray_init();
 void powerups_ray_start();

@@ -38,6 +38,8 @@ bool powerups_ray_update(){
 }
 
 void powerups_ray_hit(Entity* ennemy){
-    if((getTime(1) % 100) <= 1)
+    if(powerups_ray_cooldown-getTime(0) > 1000){
         enemies_take_damage(ennemy, 1);
+        powerups_ray_cooldown = getTime(0);
+    }
 }

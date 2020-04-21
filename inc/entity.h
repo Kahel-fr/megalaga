@@ -6,10 +6,11 @@
 #define ENTITY_ENNEMY 1
 #define ENTITY_BOSS 2
 #define ENTITY_ENNEMY_BULLET 3
+#define ENTITY_BOSS_PROJECTILE 4
 
-#define ENTITY_POWERUP 4
-#define ENTITY_BULLET 5
-#define ENTITY_RAY 6
+#define ENTITY_POWERUP 5
+#define ENTITY_BULLET 6
+#define ENTITY_RAY 7
 
 //entity structure (like player, ennemies, ect...)
 typedef struct {

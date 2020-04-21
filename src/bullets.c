@@ -9,10 +9,10 @@ void bullets_init(){
 void bullets_update(){
     for (t_element *tmp = container_bullets->first; tmp != NULL; tmp = tmp->next){
         Entity* b = (Entity*)tmp->data;
-        //KDebug_AlertNumber(b->health);
             if(b->health > 0){
-                if(b->type == ENTITY_BULLET || b->type == ENTITY_ENNEMY_BULLET){
+                if(b->type == ENTITY_BULLET || b->type == ENTITY_ENNEMY_BULLET || b->type == ENTITY_BOSS_PROJECTILE){
                     b->y += b->vely;
+                    b->x += b->velx;
                     if(b->y + b->h < 0 || b->y + b->h > BOTTOM_EDGE){
                         bullets_kill(b);
                     } else{
