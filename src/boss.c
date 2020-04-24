@@ -6,7 +6,7 @@ void boss_init(){
         boss_entity.y = 0;
         boss_entity.w = 64;
         boss_entity.h = 48;
-        boss_entity.maxhealth = 29;
+        boss_entity.maxhealth = 3;
         boss_entity.health = boss_entity.maxhealth;
         boss_entity.sprite = SPR_addSprite(&boss,boss_entity.x,boss_entity.y,TILE_ATTR(PAL3,0,FALSE,FALSE));
         sprintf(boss_entity.name, "boss");
@@ -24,53 +24,13 @@ void boss_init(){
 }
 
 void boss_update(){
-    if(boss_entity.health <= 0){
-        boss_kill();
-        return;
-    }
     boss_update_movement();
     switch(boss_current_phase){
-        case 0:
-            if(!boss_is_moving){
-                boss_entity.isInvincible = enemiesLeft > 1;
-                boss_spawn_minions();
-                boss_update_minions();
-                if(boss_entity.health<16){
-                    boss_minions_spawned = 0;
-                    boss_next_phase();
-                }
-            }
+        case BOSS_PHASE_MINIONS:
+            boss_update_phase_minions();
         break;
-        case 1:
-            boss_entity.isInvincible = 1;
-            if(!boss_is_moving){
-                if(!boss_projectile_spawned)
-                    boss_shoot_projectile();
-                else{
-                    boss_update_projectile();
-                    if(boss_entity.health<13)
-                        boss_next_phase();
-                }
-            }
-        break;
-        case 2:
-            if(!boss_is_moving){
-                boss_entity.isInvincible = enemiesLeft > 1;
-                boss_spawn_minions();
-                boss_update_minions();
-                if(boss_entity.health<10)
-                        boss_next_phase();
-            }
-        break;
-        case 3:
-            boss_entity.isInvincible = 1;
-            if(!boss_is_moving){
-                if(!boss_projectile_spawned)
-                    boss_shoot_projectile();
-                else{
-                    boss_update_projectile();
-                }
-            }
+        case BOSS_PHASE_TENNIS:
+            boss_update_phase_tennis();
         break;
     }
     SPR_setPosition(boss_entity.sprite,boss_entity.x,boss_entity.y);
@@ -81,28 +41,33 @@ void boss_kill(){
     isBossWave = 0;
 }
 
+void boss_hit(){
+    enemies_take_damage(&boss_entity, 1);
+    hud_print();
+    if(boss_entity.health>0)
+        boss_next_phase();
+    else
+        boss_kill();
+}
+
 void boss_next_phase(){
     boss_current_phase++;
+    if(boss_current_phase>1)
+        boss_current_phase = 0;
     boss_start_phase();
 }
 
 void boss_start_phase(){
+    u8 x = (random() % (RIGHT_EDGE-boss_entity.w/2));
+    u8 y = (random() % (BOTTOM_EDGE-200));
+    boss_move_to(x, y);
+    boss_entity.isInvincible = boss_is_moving;
     switch(boss_current_phase){
-        case 0:
-            boss_entity.isInvincible = 1;
-            boss_move_to((RIGHT_EDGE/2)-(boss_entity.w/2), BOTTOM_EDGE-180);
+        case BOSS_PHASE_MINIONS:
+            boss_start_phase_minions();
         break;
-        case 1:
-            boss_entity.isInvincible = 1;
-            boss_move_to(RIGHT_EDGE-boss_entity.w, 0);
-        break;
-        case 2:
-            boss_entity.isInvincible = 1;
-            boss_move_to((RIGHT_EDGE/2)-(boss_entity.w/2), BOTTOM_EDGE-180);
-        break;
-        case 3:
-            boss_entity.isInvincible = 1;
-            boss_move_to(0, 0);
+        case BOSS_PHASE_TENNIS:
+            boss_start_phase_tennis();
         break;
     }
 }
@@ -118,7 +83,7 @@ void boss_move_to(int x, int y){
 
 void boss_update_movement(){
     if(boss_is_moving)
-        boss_is_moving = getApproximatedDistance(boss_moving_target_x - boss_entity.x, boss_moving_target_y - boss_entity.y)>1;
+        boss_is_moving = getApproximatedDistance(boss_moving_target_x - boss_entity.x, boss_moving_target_y - boss_entity.y)>5;
     if(!boss_is_moving){
         boss_entity.x = boss_moving_target_x;
         boss_entity.y = boss_moving_target_y;
@@ -178,7 +143,6 @@ void boss_shoot_projectile(){
     get_direction_between_two_points(boss_projectile_entity.x+boss_projectile_entity.w/2, boss_projectile_entity.y+boss_projectile_entity.h/2, player.x+player.w/2, player.y+player.h/2, &boss_projectile_velx, &boss_projectile_vely);
     boss_projectile_velx = fix16Mul(boss_projectile_velx, FIX16(2));
     boss_projectile_vely = fix16Mul(boss_projectile_vely, FIX16(2));
-    KDebug_AlertNumber(boss_projectile_velx);
 
     boss_projectile_entity.maxhealth = 1;
     boss_projectile_entity.health = boss_projectile_entity.maxhealth;
@@ -198,7 +162,7 @@ void boss_update_projectile(){
         boss_projectile_entity.x = fix16ToRoundedInt(boss_projectile_x);
         boss_projectile_entity.y = fix16ToRoundedInt(boss_projectile_y);
         if(boss_projectile_is_reflected && doesCollide(&boss_projectile_entity, &boss_entity)){
-            enemies_take_damage(&boss_entity, 1);
+            boss_hit();
             bullets_kill(&boss_projectile_entity);
         }
     }
@@ -209,4 +173,30 @@ void boss_projectile_hit_by_player(){
     boss_projectile_velx = fix16Mul(boss_projectile_velx, FIX16(2));
     boss_projectile_vely = fix16Mul(boss_projectile_vely, FIX16(2));
     boss_projectile_is_reflected = 1;
+}
+
+void boss_start_phase_minions(){
+    boss_minions_spawned = 0;
+}
+
+void boss_start_phase_tennis(){
+
+}
+
+void boss_update_phase_minions(){
+    if(!boss_is_moving){
+        boss_entity.isInvincible = enemiesLeft > 1;
+        boss_spawn_minions();
+        boss_update_minions();
+    }
+}
+
+void boss_update_phase_tennis(){
+    boss_entity.isInvincible = 1;
+    if(!boss_is_moving){
+        if(!boss_projectile_spawned)
+            boss_shoot_projectile();
+        else
+            boss_update_projectile();
+    }
 }

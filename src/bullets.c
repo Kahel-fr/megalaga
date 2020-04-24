@@ -41,10 +41,12 @@ void bullets_spawn(int x, int y, bool shotByEnnemy){
         b->sprite = SPR_addSprite(&bullet,b->x,b->y,TILE_ATTR(PAL1,0,FALSE,FALSE));
         t_element * obj = create_element(b);
         add_element_to_container(container_bullets, obj);
-        bulletsOnScreen++;
+        if(b->type==ENTITY_BULLET)
+            bulletsOnScreen++;
 }
 
 void bullets_kill(Entity* b){
     b->health = 0;
-    bulletsOnScreen--;
+    if(b->type==ENTITY_BULLET&&bulletsOnScreen>0)
+        bulletsOnScreen--;
 }

@@ -31,6 +31,6 @@ void player_update(){
 
 //shoot a bullet
 void shootBullet(){
-    if(!powerups_active)
+    if(!powerups_active && bulletsOnScreen < 3)
         bullets_spawn(player.x, player.y, 0);
 }

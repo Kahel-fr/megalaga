@@ -53,12 +53,12 @@ void ennemies_reset(){
     int ennemies_count = ((wavesCount%MAX_ENEMIES));
     int ennemies_speed = 1+wavesCount/MAX_ENEMIES;
     int ennemies_health = ennemies_speed*2;
-    for (u16 i = 0; i < ennemies_count;i++) 
+    for (u16 i = 0; i < ennemies_count;i++)
     {
         Entity *e = MEM_alloc(sizeof(Entity));
         e->type = ENTITY_ENNEMY;
-        e->x = i*32;
-        e->y = 16;
+        e->x = (i%10)*32;
+        e->y = 16*((i/10)*2);
         e->w = 16;
         e->h = 16;
         e->velx = ennemies_speed;
@@ -69,7 +69,6 @@ void ennemies_reset(){
         t_element * obj = create_element(e);
         add_element_to_container(container_enemies, obj);
         enemiesLeft++;
-        i++;
     }
     timer = getTime(0);
 }
@@ -83,8 +82,6 @@ void enemies_kill(Entity* e){
 
 void enemies_take_damage(Entity* e, int damage){
     entity_take_damage(e, damage);
-    if(e->type == ENTITY_BOSS)
-        hud_print();
 }
 
 void enemies_random_shoot(Entity* e){

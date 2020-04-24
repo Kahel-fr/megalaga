@@ -47,8 +47,6 @@ void   del_element_from_container(t_container *container, t_element *element)
     container->first = element->next;
     if (element->data)
     {
-      //if (((t_entity*)elem->data)->sprite != NULL)
-        //SPR_releaseSprite(((t_entity*)elem->data)->sprite);
       MEM_free(element->data);
       element->data = NULL;
     }
@@ -77,9 +75,6 @@ void   del_element_from_container(t_container *container, t_element *element)
     }
   if (elem->data)
   {
-    // WORKING ON THIS
-    /*if (((t_entity*)elem->data)->sprite != NULL)
-      SPR_releaseSprite(((t_entity*)elem->data)->sprite);*/
     MEM_free(elem->data);
     elem->data = NULL;
   }

@@ -26,6 +26,7 @@ bool boss_projectile_is_reflected;
 void boss_init();
 void boss_update();
 void boss_kill();
+void boss_hit();
 void boss_next_phase();
 void boss_start_phase();
 void boss_move_to(int x, int y);
@@ -40,4 +41,11 @@ void boss_update_projectile();
 void boss_projectile_hit_by_player();
 
 void boss_update_movement();
+
+void boss_start_phase_minions();
+void boss_start_phase_tennis();
+
+void boss_update_phase_minions();
+void boss_update_phase_tennis();
+
 #endif

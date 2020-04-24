@@ -43,7 +43,9 @@ void checkCollisions(){
                     Entity* e = (Entity*)tmp->data;
                     if(e->health > 0 && !e->isInvincible){
                         if(doesCollide(e, b)){
-                            //KDebug_AlertNumber(b->type);
+                            if(e->type==ENTITY_BOSS)
+                                boss_hit();
+                            else
                             switch(b->type){
                                 case ENTITY_RAY:
                                     powerups_ray_hit(e);
@@ -138,7 +140,7 @@ void loadWave(){
 
 void game_reset(){
     paused = 0;
-    wavesCount = 9;
+    wavesCount = 0;
     isBossWave = 0;
     ennemies_clear();
     player_reset();
